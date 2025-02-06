@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+
 @RunWith(JUnitQuickcheck.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class AgriturismoTest {
@@ -35,6 +38,7 @@ public class AgriturismoTest {
     // Unit test
     @Test
     public void testGestioneProdottiBottega() {
+        System.out.println("testGestioneProdottiBottega");
         // Creazione di una bottega, di prodotti e di un agriturismo
         Bottega bottega = new Bottega("Bottega del Gusto", "Via Sapori 5");
         Prodotto vino = new Prodotto("Vino Rosso", 15.0);
@@ -56,6 +60,7 @@ public class AgriturismoTest {
 
     @Test
     public void testGestionePrezzoAttivita() {
+        System.out.println("testGestionePrezzoAttivita");
         Attivita attivita = new Attivita("Equitazione", "Passeggiata a cavallo", 20.0);
 
         attivita.setPrezzoAgg(30.0);
@@ -64,6 +69,7 @@ public class AgriturismoTest {
 
     @Test
     public void testGestionePrezzoProdotti() {
+        System.out.println("testGestionePrezzoProdotti");
         Prodotto prodotto = new Prodotto("Vino Rosso", 15.0);
 
         prodotto.setCosto(20.0);
@@ -193,4 +199,92 @@ public class AgriturismoTest {
     }
 
     
+    // Integration test
+    @Test
+    public void testCalcolaSpesaIntegration() {
+        // Simula l'integrazione tra il servizio, i clienti e le attività
+        System.out.println("testCalcolaSpesaIntegration");
+           
+        Cliente cliente = db.getClienti().get(0);
+        Agriturismo agriturismo = db.getAgriturismi().get(0);
+        List<Attivita> attivita = db.getAttivita();
+   
+        double spesa = clienteService.calcolaSpesa(cliente, agriturismo, attivita, 2);
+        double spesaAttesa = (agriturismo.getCostoNotte() * (cliente.getNumFamiliari() + 1) * 2) +
+                              attivita.stream().mapToDouble(Attivita::getPrezzoAgg).sum();
+        assertEquals(spesaAttesa, spesa, "La spesa calcolata non è corretta");
+    }
+    
+    @Test
+    public void testGestioneClienteIntegration() {
+       System.out.println("testGestioneClienteIntegration");
+       
+       Cliente cliente = db.getClienti().get(0); // Prendo un cliente esistente
+       
+       // Verifico che il cliente sia stato aggiunto
+       clienteService.aggiungiCliente(cliente, db.getAgriturismi());
+       assertTrue(clienteService.trovaCliente(cliente.getCodFisc()).isPresent());
+   
+       // Test ricerca
+       Optional<Cliente> clienteTrovato = clienteService.trovaCliente(cliente.getCodFisc());
+       assertTrue(clienteTrovato.isPresent());
+       assertEquals(cliente.getNome(), clienteTrovato.get().getNome());
+       assertEquals(cliente.getIndirizzo(), clienteTrovato.get().getIndirizzo());
+       assertEquals(cliente.getSesso(), clienteTrovato.get().getSesso());
+
+       // Verifico che il cliente sia stato eliminato
+       clienteService.eliminaCliente(cliente.getCodFisc());
+       assertFalse(clienteService.trovaCliente(cliente.getCodFisc()).isPresent());
+    }
+     
+    @Test
+    public void testMenuManagerInizializzazione() {
+       System.out.println("testMenuManagerInizializzazione");
+       // Aggiungo i clienti esistenti
+       db.getClienti().forEach(cliente -> {
+         clienteService.aggiungiCliente(cliente, db.getAgriturismi());
+       });
+   
+       // Verifica che i clienti siano stati correttamente inizializzati
+       assertEquals(db.getClienti().size(), clienteService.getElencoClienti().size());
+    }
+
+    @Test
+    public void testGestioneProdottiBottegaIntegration() {
+      System.out.println("testGestioneProdottiBottegaIntegration");
+
+      // Verifica prima bottega = Bottega del Gusto
+      Bottega bottega = db.getBotteghe().get(0);
+      Map<Agriturismo, Map<Prodotto, Integer>> forniture = bottega.getFornitureProdotti();
+
+      assertEquals(2, forniture.size(), "La Bottega del Gusto dovrebbe avere forniture da 2 agriturismi");
+      assertTrue(forniture.get(db.getAgriturismi().get(0)).containsKey(db.getProdotti().get(0)),
+         "Dovrebbe avere il vino dal primo agriturismo");
+
+    }
+
+    // Test MenuManager con input simulato
+    @Test
+    public void testMenuManager() {
+      System.out.println("testMenuManager");
+
+      String input = "1\n1234561234567890\nMario\nBianchi\n35\nM\nVia Test 1\n2\nLe Vele\n7\n3\n1234561234567890\n2\n0\n5\n4\n1\n2\n1234561234567890\n6\n1472583691472583\n9\n0\n";
+      System.setIn(new java.io.ByteArrayInputStream(input.getBytes()));
+
+      MenuManager menu = new MenuManager(clienteService, db);
+      menu.start();
+
+      assertTrue(clienteService.trovaCliente("1234561234567890").isPresent());
+      assertFalse(clienteService.trovaCliente("1472583691472583").isPresent());
+
+    }
+
+    // Test Main
+    @Test
+    public void testMain() {
+      System.out.println("testMain");
+      System.setIn(new java.io.ByteArrayInputStream("0\n".getBytes()));
+      assertDoesNotThrow(() -> Main.main(new String[]{}));
+    }
+
 }
