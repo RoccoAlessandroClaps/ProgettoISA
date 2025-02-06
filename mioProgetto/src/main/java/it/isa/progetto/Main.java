@@ -47,7 +47,12 @@ public class Main {
         // Stampa del risultato 
         System.out.println("Spesa cliente: " + clienteDaCalcolare); 
         System.out.println("Agriturismo: " + agriturismoAssociato); 
-        System.out.println("Totale: " + spesa + " EUR");  
+        System.out.println("Totale: " + spesa + " EUR");
+
+        // Stampa dei prodotti forniti alla prima bottega
+        System.out.println();
+        System.out.println();
+        botteghe.get(0).stampaProdottiForniti();  
 
     }
 

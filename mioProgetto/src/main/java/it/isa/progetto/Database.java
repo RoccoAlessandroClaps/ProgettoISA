@@ -46,8 +46,12 @@ public class Database {
         prodotti.add(new Prodotto("Miele Artigianale", 10.0));
         prodotti.add(new Prodotto("Olio Extra Vergine", 12.0));
 
+
         botteghe.add(new Bottega("Bottega del Gusto", "Via Sapori 5"));
         botteghe.add(new Bottega("La Tradizione", "Via Antica 7"));
 
+        botteghe.get(0).aggiungiFornitura(agriturismi.get(0), prodotti.get(0), 20);
+        botteghe.get(0).aggiungiFornitura(agriturismi.get(0), prodotti.get(2), 15); 
+        botteghe.get(0).aggiungiFornitura(agriturismi.get(1), prodotti.get(1), 10); 
     }
 }
