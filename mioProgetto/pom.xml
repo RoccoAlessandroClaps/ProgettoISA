@@ -74,12 +74,21 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.0.0</version>
+          <executions>
+          <execution>
+            <id>execution1</id>
+            <phase>compile</phase>
           <configuration>
           <mainClass>it.isa.progetto.Main</mainClass>
           <!-- <arguments>
            <argument>argument1</argument>
           </arguments> -->
           </configuration>
+          <goals>
+            <goal>java</goal>
+          </goals>
+          </execution>
+          </executions>
         </plugin>
 
       </plugins>
