@@ -5,12 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.runner.RunWith;
+
+import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.generator.InRange;
+import com.pholser.junit.quickcheck.From;
+import com.pholser.junit.quickcheck.generator.Size;
 
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@RunWith(JUnitQuickcheck.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class AgriturismoTest {
 
@@ -123,5 +131,66 @@ public class AgriturismoTest {
         assertEquals(0, clienteService.getElencoClienti().size(), "La lista clienti dovrebbe essere vuota dopo l'eliminazione");
         assertDoesNotThrow(() -> clienteService.eliminaCliente(codiceInesistente));
     }
+
+
+    // Property-based test
+    @Property
+    public void testSpesaTotalePositiva(@InRange(min = "1", max = "30") int numNotti, 
+                                        @From(AgriturismoGenerator.class) Agriturismo agriturismo, 
+                                        @From(ClienteGenerator.class) Cliente cliente,
+                                        @Size(min = 0, max = 5) List<@From(AttivitaGenerator.class) Attivita> attivita) {
+    cliente.setAgriturismo(agriturismo);
+    ClienteService clienteService = new ClienteService();
+    double spesa = clienteService.calcolaSpesa(cliente, agriturismo, attivita, numNotti);
+    assertTrue(spesa >= 0.0, "La spesa totale non può essere negativa");
+
+    // Verifica che la spesa aumenta con i servizi extra
+    if (!attivita.isEmpty()) {
+        double spesaSenzaAttivita = clienteService.calcolaSpesa(cliente, agriturismo, List.of(), numNotti);
+        assertTrue(spesa > spesaSenzaAttivita, "La spesa con attivita deve essere maggiore della spesa base");
+        }
+    }
+
+    //Il prezzo per notte deve sempre essere non negativo
+    @Property
+    public void testPrezzoNotteNonNegativo(@InRange(min = "-1000.0", max = "10000.0") double costoNotte) {
+        if (costoNotte < 0)  {
+           assertThrows(IllegalArgumentException.class, () -> { 
+           new Agriturismo("Nome", "Via Test", "nome@test.com", costoNotte, 2020);
+        });
+       } else {
+           Agriturismo agriturismo = new Agriturismo("Nome", "Via Test", "nome@test.com", costoNotte, 2020);
+           assertEquals(costoNotte, agriturismo.getCostoNotte());
+       }
+    } 
+
+    //Il cliente prenotante deve essere maggiorenne
+    @Property
+    public void testValidazioneEtaCliente(@InRange(min = "-120", max = "120") int eta) {
+        if (eta < 18) {
+           assertThrows(IllegalArgumentException.class, () -> { 
+           new Cliente("7418521234567845", "Nome", "Cognome", eta, "M", "Via Test 1", null, 2);
+        });
+       } else {
+           Cliente cliente = new Cliente("7418521234567845", "Nome", "Cognome", eta, "M", "Via Test 1", null, 2);
+           assertEquals(eta, cliente.getEta());
+       }
+    }
+    
+    //Il codice fiscale deve essere lungo 16 cifre (per semplicità)
+    @Property
+    public void testCodiceFiscaleLunghezza(@InRange(min = "0", max = "30") int lunghezza) {
+        String codiceFiscale = "0".repeat(lunghezza);
+   
+        if (lunghezza != 16) {
+           assertThrows(IllegalArgumentException.class, () -> {
+           new Cliente(codiceFiscale, "Mario", "Rossi", 30, "M", "Via Roma 10", null, 2);
+        });
+       } else {
+           Cliente cliente = new Cliente(codiceFiscale, "Mario", "Rossi", 30, "M", "Via Roma 10", null, 2);
+           assertEquals(16, cliente.getCodFisc().length(), "Il codice fiscale deve avere esattamente 16 caratteri!");
+       }
+    }
+
     
 }
