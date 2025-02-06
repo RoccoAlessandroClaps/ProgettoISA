@@ -44,4 +44,9 @@ public class Agriturismo {
         return annoIn;
     }
 
+    @Override
+    public String toString() {
+        return nome + " (" + indirizzo + ")";
+    }
+
 }
