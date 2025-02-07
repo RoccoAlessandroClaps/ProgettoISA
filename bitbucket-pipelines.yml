@@ -19,10 +19,17 @@ pipelines:
             # CI: build e test
             - export CI=true
             - mvn -B verify --file mioProgetto/pom.xml
+            # creo immagine docker pronta per essere pubblicata su dockerhub
+            - docker image build -f mioProgetto/Dockerfile --tag lssndr96/progettoisa:0.1 mioProgetto
+            # login su dockerhub
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            # push dell'immagine su dockerhub
+            - docker push lssndr96/progettoisa:0.1
           after-script:  
             # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
             - pipe: atlassian/checkstyle-report:0.3.0
-        
+          services:
+            - docker        
   
   
       - step:
