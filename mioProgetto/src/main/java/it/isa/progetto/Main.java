@@ -11,7 +11,7 @@ public class Main {
 
         // Avvio dell'interfaccia utente
         String ci = System.getenv("CI");
-        if (ci == null !! !ci.equals("true")) {
+        if (ci == null || !ci.equals("true")) {
            MenuManager menu = new MenuManager(clienteService, db);
            menu.start();
         } else {
