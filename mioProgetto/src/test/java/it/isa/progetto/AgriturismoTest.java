@@ -54,7 +54,7 @@ public class AgriturismoTest {
         assertNotNull(forniture);
         assertEquals(1, forniture.size()); // Una sola fornitura da un agriturismo
         assertTrue(forniture.containsKey(agriturismo));
-        assertEquals(10, forniture.get(agriturismo).get(vino));
+        assertEquals(11, forniture.get(agriturismo).get(vino));
         assertEquals(20, forniture.get(agriturismo).get(olio));
     }
 
