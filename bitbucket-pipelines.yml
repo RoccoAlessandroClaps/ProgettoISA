@@ -22,9 +22,25 @@ pipelines:
           after-script:  
             # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
             - pipe: atlassian/checkstyle-report:0.3.0
+
+  branches:
+      main:
+      - step:
+          name: Build and Test (CI)
+          caches:
+            - maven
+          script:
+            # CI: build e test
+            - export CI=true
+            - mvn -B verify --file mioProgetto/pom.xml
+          after-script:  
+            # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
+            - pipe: atlassian/checkstyle-report:0.3.0
+          services:
+            - docker
           artifacts:
             - mioProgetto/target/**
-  
+   
       - step:
           name: Deploy su dockerhub (CD)
           script:
