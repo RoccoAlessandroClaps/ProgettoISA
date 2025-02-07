@@ -12,26 +12,31 @@ pipelines:
   # viene eseguita per tutti i branch che non hanno una pipeline associata
   default:
       - step:
-          name: Build and Test
+          name: Build and Test (CI)
           caches:
             - maven
           script:
             # CI: build e test
             - export CI=true
             - mvn -B verify --file mioProgetto/pom.xml
+          after-script:  
+            # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
+            - pipe: atlassian/checkstyle-report:0.3.0
+          artifacts:
+            - mioProgetto/target/**
+  
+      - step:
+          name: Deploy su dockerhub (CD)
+          script:
             # creo immagine docker pronta per essere pubblicata su dockerhub
             - docker image build -f mioProgetto/Dockerfile --tag lssndr96/progettoisa:0.1 mioProgetto
             # login su dockerhub
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
             # push dell'immagine su dockerhub
             - docker push lssndr96/progettoisa:0.1
-          after-script:  
-            # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
-            - pipe: atlassian/checkstyle-report:0.3.0
           services:
-            - docker        
-  
-  
+            - docker 
+
       - step:
           name: Security Scan
           script:
