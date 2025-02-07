@@ -138,6 +138,29 @@ public class AgriturismoTest {
         assertDoesNotThrow(() -> clienteService.eliminaCliente(codiceInesistente));
     }
 
+    @Test
+    public void testCalcolaSpesaTotaleProdotti() {
+        // Creazione di agriturismi, prodotti e bottega
+        Bottega bottega = new Bottega("Bottega del Gusto", "Via Sapori 5");
+
+        Agriturismo agriturismo1 = new Agriturismo("Le Vele", "Via Cavour 10", "info@levele.com", 50.0, 2005);
+        Agriturismo agriturismo2 = new Agriturismo("La Quiete", "Via Verde 12", "info@laquiete.it", 75.0, 2000);
+
+        Prodotto vino = new Prodotto("Vino Rosso", 15.0);
+        Prodotto miele = new Prodotto("Miele Artigianale", 10.0);
+        Prodotto olio = new Prodotto("Olio Extra Vergine", 12.0);
+
+        bottega.aggiungiFornitura(agriturismo1, vino, 20);  // 20 * 15 = 300
+        bottega.aggiungiFornitura(agriturismo1, olio, 15);  // 15 * 12 = 180
+        bottega.aggiungiFornitura(agriturismo2, miele, 10); // 10 * 10 = 100
+
+        // Calcolo della spesa totale
+        double spesaTotale = bottega.calcolaSpesaTotaleProdotti();
+
+        // Verifica del risultato atteso (300 + 180 + 100 = 580)
+        assertEquals(580.0, spesaTotale, "La spesa totale dei prodotti non è corretta");
+    }
+
 
     // Property-based test
     @Property
@@ -260,6 +283,10 @@ public class AgriturismoTest {
       assertEquals(2, forniture.size(), "La Bottega del Gusto dovrebbe avere forniture da 2 agriturismi");
       assertTrue(forniture.get(db.getAgriturismi().get(0)).containsKey(db.getProdotti().get(0)),
          "Dovrebbe avere il vino dal primo agriturismo");
+
+      //Verifica calcolo spesa totale
+      double spesaTotale = bottega.calcolaSpesaTotaleProdotti();
+      assertEquals(580.0, spesaTotale, "La spesa totale non è corretta");
 
     }
 

@@ -170,6 +170,7 @@ public class MenuManager {
             Bottega bottegaScelta = botteghe.get(scelta-1);
             System.out.println("\nProdotti forniti alla bottega " + bottegaScelta.getNome() + " (" + bottegaScelta.getIndirizzo() + "):");
             bottegaScelta.stampaProdottiForniti();
+            System.out.println("Spesa totale prodotti: " + bottegaScelta.calcolaSpesaTotaleProdotti() + " EUR");
         } else {
             System.out.println("Scelta non valida!");
         }

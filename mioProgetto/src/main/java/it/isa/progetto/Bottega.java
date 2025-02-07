@@ -52,4 +52,13 @@ public class Bottega {
         return new HashMap<>(fornitureProdotti);
     }
 
+    //**Nuovo metodo per calcolare la spesa totale dei prodotti**
+    public double calcolaSpesaTotaleProdotti() {
+        return fornitureProdotti.entrySet().stream()
+            .flatMap(entry -> entry.getValue().entrySet().stream())
+            .mapToDouble(prodEntry -> prodEntry.getKey().getCosto() * prodEntry.getValue())
+            .sum();
+    }
+
+
 }
