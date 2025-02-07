@@ -140,6 +140,7 @@ public class AgriturismoTest {
 
     @Test
     public void testCalcolaSpesaTotaleProdotti() {
+        System.out.println("testCalcolaSpesaTotaleProdotti");
         // Creazione di agriturismi, prodotti e bottega
         Bottega bottega = new Bottega("Bottega del Gusto", "Via Sapori 5");
 
