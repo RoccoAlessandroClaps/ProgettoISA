@@ -10,7 +10,12 @@ public class Main {
         db.getClienti().forEach(cliente -> { clienteService.aggiungiCliente(cliente, db.getAgriturismi()); });
 
         // Avvio dell'interfaccia utente
-        MenuManager menu = new MenuManager(clienteService, db);
-        menu.start();
+        String ci = System.getenv("CI");
+        if (ci == null !! !ci.equals("true")) {
+           MenuManager menu = new MenuManager(clienteService, db);
+           menu.start();
+        } else {
+           System.out.println("Esecuzione in CI/CD, salto l'interfaccia utente");
+        }
     }
 }

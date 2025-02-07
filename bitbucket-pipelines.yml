@@ -17,6 +17,7 @@ pipelines:
             - maven
           script:
             # CI: build e test
+            - export CI=true
             - mvn -B verify --file mioProgetto/pom.xml
           after-script:  
             # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
